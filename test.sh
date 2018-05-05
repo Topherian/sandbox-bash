@@ -3,17 +3,22 @@
      
 RUN_DATE=$(date +%Y-%m-%d)
 LOGFILE=./manifest-space-remover-"$RUN_DATE".log
+
+#regex pattern for a space
+REGEX_PATTERN=" |'"
+
 exec 3>&1 4>&2
 exec 1>>"$LOGFILE" 2>&1
 
 function traverse_manifests() {
     for file in "$1"/*
     do
-        if [ ! -d "${file}" ] ; then
+        if [ ! -d "${file}" ] 
+        then
             [ -e "$file" ] || continue 
             echo "$(date "+%Y-%m-%d %T") : Checking file - $file" 
             #check if file has a space, if so rename
-            if [[ "$file" =~ \ |\' ]]
+            if [[ "$file" =~ $REGEX_PATTERN ]]
             then
                 echo "$(date "+%Y-%m-%d %T") : $file contains a space, so will remove and rename."
                 mv "$file" "${file// /}"
